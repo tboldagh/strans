@@ -37,3 +37,9 @@ def commnt(args):
 ```
 
 And do not forget to share your nice extensions.
+
+#Installations
+Clone the repo or just pick the `strans.py`, for convenience rename (or link) as `strans` and put anywhere it in your `PATH`.
+
+# TODO
+Unit testing - help is welcome here.
