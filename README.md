@@ -1,7 +1,7 @@
 # Strings transformations for NIXers
 
-You probably used those NIX programs that let you you transform text in the daily work. 
-Probably you have your own seto of favourite tools ... the `sed`  can be used to replace strings, `awk` do some more formatting, `cut` - ah how useful is that one!
+You probably used those NIX programs that let you transform text in the daily work. 
+Probably you have your own set of favourite tools ... the `sed`  to replace strings, the `awk` do some more formatting, `cut` - to pick a field ... ah how useful is that one!
 But each of them is a bit different, has own syntax of commands, specialities .... well, the history.
 What if there would be one simple program that would let you do the transformation we usually need to do.
 
