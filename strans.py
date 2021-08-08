@@ -7,8 +7,32 @@ Shell helper program to facilitate strings manipulation
 import sys
 # possible transformations
 
+def split(args):
+    """INPUT Splits string into a list of elements
+        If not argument is given then the white characters are used
+    """
+    if args.strip() == 'split':
+        return lambda input: input.split()
+    return lambda input: input.split(args.split()[1])
+
+def cont(args):
+    """FILTERING Retain elements containing substring
+    """
+    s = args.split()[1]
+    def _f(input):
+       return [ i for i in input if s in i ]
+    return _f
+
+def ncont(args):
+    """FILTERING Drop elements containing substring
+    """
+    s = args.split()[1]
+    def _f(input):
+       return [ i for i in input if s not in i ]
+    return _f
+
 def replace(args):
-    """Replaces sub-strings (requires two arguments, string to be replaces and the replacement)
+    """MODIFICATION Replaces sub-strings (requires two arguments, string to be replaces and the replacement)
         If the substring is absent in an element does nothing
     """
     f,t = args.split()[1:]
@@ -17,7 +41,7 @@ def replace(args):
     return _f
 
 def rem(args):
-    """Removes sub-string (requires one argument)
+    """MODIFICATION Removes sub-string (requires one argument)
     """
     f=args.split()[1]
     def _f(input):
@@ -26,21 +50,21 @@ def rem(args):
 
 
 def dquote(args):
-    """ Wraps elements in double quotes
+    """MODIFICATION Wraps elements in double quotes
     """
     def _f(input):
        return [ '"'+i+'"' for i in input ]
     return _f
 
 def squote(args):
-    """ Single quote (identical to wrap ' ')
+    """MODIFICATION Single quotes around each element
     """
     def _f(input):
        return [ "'"+i+"'" for i in input ]
     return _f
 
 def app(args):
-    """ Appends a string to the element
+    """MODIFICATION Appends a string to the element
         If not argument is given a space is appended
     """
     s = ' '  if args.strip() == 'app' else args.split()[1]
@@ -49,7 +73,7 @@ def app(args):
     return _f
 
 def prep(args):
-    """ Prepends a string to the element
+    """MODIFICATION Prepends a string to the element
     """
     s = args.split()[1]
     def _f(input):
@@ -57,88 +81,92 @@ def prep(args):
     return _f
 
 
-def join(args):
-    """ Concatenate elements using delimeter passed
-        If no delimeter is passed the the space character is used
-    """
-    s = ' '  if args.strip() == 'join' else args.replace('split', '', 1).strip()
-    def _f(input):
-       return s.join(input)
-    return _f
-
-def nl(args):
-    """"Joins with newline character"""
-    return lambda input: "\n".join(input)
-
-def cont(args):
-    """Retains elements containing substring
-    """
-    s = args.split()[1]
-    def _f(input):
-       return [ i for i in input if s in i ]
-    return _f
-
-def ncont(args):
-    """Filters out elements containing substring
-    """
-    s = args.split()[1]
-    def _f(input):
-       return [ i for i in input if s not in i ]
-    return _f
-
 def strip(args):
-    """Drops white characters around the element
+    """MODIFICATION Drops white characters around the element
     """
     def _f(input):
        return [ strip(i) for i in input ]
     return _f
 
 def pick(args):
-    """Pick a filed in each element that is separated by a first arg and under given index
+    """MODIFICATION  Pick a filed in each element that is separated by a first arg and under given index
        pick . 3 will split the element using the . into fields and pick 3rd element (counting from 0 of course)
        If the last part can be more numbers separated by coma, in such case several fields are selected
     """
-    def _f(args):
-        sep = args.split()[1]
-        fields = [ int(i) for i in args.split()[2].split(',') ]
+    sep = args.split()[1]
+    fields = [ int(i) for i in args.split()[2].split(',') ]
+    print ("pick ", sep, fields)
+    def _sel(l):
+        return sep.join([ l[i] for i in fields ])
 
-        def _sel(l):
-            return sep.join([ l[i] for i in fields ])
-
-        def _f(input):            
-            return [ _sel(s.split(sep)) for s in input ]
+    def _f(input):            
+        return [ _sel(s.split(sep)) for s in input ]
     return _f
 
-
-def tr(args):
-    """Translate (like the tr) set of characters by another set of characters
+def trch(args):
+    """MODIFICATION Translate (like the tr) set of characters by another set of characters
         E.g. to replace the 'tricky' characters by the '_' tr /-\. ____  
     """
     f,t = [ i.strip() for i in args.split()[1:]]
     assert len(f) == len(t), 'tr - arguments are not of equal length'
     def _repl(s):
-        return [ c if c not in f else t[f.index(c)] for c in s ]
+        return "".join([ c if c not in f else t[f.index(c)] for c in s ])
     def _f(input):
         return [ _repl(s) for s in input ]
     return _f
 
-def split(args):
-    """Splits string into a list of elements
-        If not argument is given then the white characters are used
+def delch(args):
+    """MODIFICATION Delete all characters passed as an argument
+        E.g. delch #$^ will remove those special characters  
     """
-    if args.strip() == 'split':
-        return lambda input: input.split()
-    return lambda input: input.split(args.split()[1])
+    f = args.split()[1].strip()
+    def _repl(s):
+        return "".join([ c for c in s if c not in f ])
+    def _f(input):
+        return [ _repl(s) for s in input ]
+    return _f
+
+def sort(args):
+    """Sort elements
+       Arguments (need to be space separated): 
+       > - descending (ascending is default)
+       i - convert elements to integer prior to sorting
+       n - convert elements to a number (double precision)
+    """
+    sa = args.split()
+    keyextr = lambda x: x
+    reverse = False    
+    if '>' in args:
+        reverse = True
+    if 'n' in args:
+        keyextr = lambda x: float(x)
+    if 'i' in args:
+        keyextr = lambda x: int(x)
+    return lambda input: sorted(input, key=keyextr, reverse=reverse)
+
+
+def join(args):
+    """OUPTUT Concatenate elements using delimeter passed
+        If no delimeter is passed the the space character is used
+    """
+    s = ' '  if args.strip() == 'join' else args.replace('join', '', 1).strip()
+    def _f(input):
+       return s.join(input)
+    return _f
+
+def nl(args):
+    """"OUPTUT Joins with newline character"""
+    return lambda input: "\n".join(input)
 
 def wrap(args):
-    """The prep app operations combined but works on a concatenated list"""
+    """OUPTUT The prep app operations combined but works on a concatenated list"""
     prefix,suffix = args.split()[1:]
     def _f(input):
        return prefix+input+suffix
     return _f
 
 def repr(args):
-    """Make python string representation of elements list """
+    """OUPTUT Make python string representation of elements list """
     def _f(input):
        return str(input)
     return _f
