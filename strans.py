@@ -10,10 +10,18 @@ import sys
 def split(args):
     """INPUT Splits string into a list of elements
         If not argument is given then the white characters are used
+        Either split or one needs to be used at start, if the they are missing the split is assumed.
+
     """
     if args.strip() == 'split':
         return lambda input: input.split()
     return lambda input: input.split(args.split()[1])
+
+def one(args):
+    """INPUT Treat input as one string 
+        Either split or one needs to be used at start, if the they are missing the split is assumed.
+    """
+    return lambda input: [input]
 
 def cont(args):
     """FILTERING Retain elements containing substring
@@ -213,7 +221,8 @@ else:
             break
         todo.append( possible.get(st[0])(t) )
     else:
-
+        if not (todo[0].__name__.startswith("split") or todo[0].__name__.startswith("one")):
+            todo.insert(0, split("split"))  # default
         input = sys.stdin.read().strip()
         for op in todo:
             input = op(input)
