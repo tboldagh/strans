@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+# comment
+
 """
 Shell helper program to facilitate strings manipulation
 @author Tomasz Bold AGH-UST, Krakow
