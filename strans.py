@@ -17,6 +17,15 @@ def split(args):
         return lambda input: input.split()
     return lambda input: input.split(args.split()[1])
 
+def ln(args):
+    """INPUT Splits multiine string into list of of single elements
+
+    """
+    if args.strip() == 'ln':
+        return lambda input: input.split('\n')
+    else:
+        raise RuntimeError('ln takes no arguments')
+
 def one(args):
     """INPUT Treat input as one string 
         Either split or one needs to be used at start, if the they are missing the split is assumed.
@@ -38,6 +47,34 @@ def ncont(args):
     def _f(input):
        return [ i for i in input if s not in i ]
     return _f
+
+def fr(args):
+    """FILTERING Output everything from (inclusive) the occurrence of the pattern"""
+    pattern = args[2:].strip(" '\"")
+    found=False
+    def _f(input):
+        nonlocal found
+        for i in input:
+            if pattern in i:
+                found = True
+            if found:
+                yield i
+    return _f
+        
+def to(args):
+    """FILTERING Output everything until (inclusive) the occurrence of the pattern"""
+    pattern = args[2:].strip(" '\"")
+    found=True
+    def _f(input):
+        nonlocal found
+        for i in input:
+            if found:
+                yield i
+            if pattern in i:
+                found = False
+    return _f
+        
+
 
 def replace(args):
     """MODIFICATION Replaces sub-strings (requires two arguments, string to be replaces and the replacement)
@@ -221,8 +258,6 @@ else:
             break
         todo.append( possible.get(st[0])(t) )
     else:
-        if not (todo[0].__name__.startswith("split") or todo[0].__name__.startswith("one")):
-            todo.insert(0, split("split"))  # default
         input = sys.stdin.read().strip()
         for op in todo:
             input = op(input)
