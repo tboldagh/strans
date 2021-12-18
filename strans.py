@@ -135,7 +135,7 @@ def strip(args):
 
 def pick(args):
     """MODIFICATION  Pick a filed in each element that is separated by a first arg and under given index
-       pick . 3 will split the element using the . into fields and pick 3rd element (counting from 0 of course)
+       'pick . 3' will split the element using the . into fields and pick 3rd element (counting from 0 of course)
        If the last part can be more numbers separated by coma, in such case several fields are selected
     """
     sep = args.split()[1]
@@ -146,6 +146,15 @@ def pick(args):
 
     def _f(input):            
         return [ _sel(s.split(sep)) for s in input ]
+    return _f
+
+def el(args):
+    """MODIFICATION select elements, they need to be comna separated list e.g.:
+    el 2,4,6
+    """
+    fields = [int(i) for i in args.split()[1].split(',') ]
+    def _f(input):
+        return [ e for i,e in enumerate(input) if i in fields ]
     return _f
 
 def trch(args):
@@ -159,6 +168,21 @@ def trch(args):
     def _f(input):
         return [ _repl(s) for s in input ]
     return _f
+
+def upper(args):
+    """MODIFICATION upercase all letters    
+    """
+    def _f(input):
+        return [s.upper() for s in input]
+    return _f
+
+def lower(args):
+    """MODIFICATION lowercase all letters    
+    """
+    def _f(input):
+        return [s.lower() for s in input]
+    return _f
+
 
 def delch(args):
     """MODIFICATION Delete all characters passed as an argument
@@ -194,17 +218,18 @@ def join(args):
     """OUPTUT Concatenate elements using delimeter passed
         If no delimeter is passed the the space character is used
     """
-    s = ' '  if args.strip() == 'join' else args.replace('join', '', 1).strip()
+    s = ''  if args.strip() == 'join' else args.replace('join', '', 1).strip().strip("'").strip('"')
     def _f(input):
        return s.join(input)
     return _f
+
 
 def nl(args):
     """"OUPTUT Joins with newline character"""
     return lambda input: "\n".join(input)
 
 def wrap(args):
-    """OUPTUT The prep app operations combined but works on a concatenated list"""
+    """OUPTUT Like the prep app operations combined, works on a concatenated list"""
     prefix,suffix = args.split()[1:]
     def _f(input):
        return prefix+input+suffix
