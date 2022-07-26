@@ -195,6 +195,19 @@ def delch(args):
         return [ _repl(s) for s in input ]
     return _f
 
+def math(args):
+    """MODIFICATION apply a mathematical function to each element
+        E.g. math pow(_, 2)
+        math _*17.3
+    """
+    def mod(a):
+        return eval(args.split()[1].replace('_', str(a)))
+
+    def _f(input):
+        return [mod(float(s)) for s in input] 
+    return _f
+
+
 def sort(args):
     """Sort elements
        Arguments (need to be space separated): 
@@ -220,7 +233,7 @@ def join(args):
     """
     s = ''  if args.strip() == 'join' else args.replace('join', '', 1).strip().strip("'").strip('"')
     def _f(input):
-       return s.join(input)
+       return s.join([str(s) for s in input])
     return _f
 
 
@@ -240,6 +253,7 @@ def repr(args):
     def _f(input):
        return str(input)
     return _f
+
 
 # to extend ... define more functions of that sort
 
